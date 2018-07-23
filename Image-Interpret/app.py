@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+#TODO - write to Google Cloud Storage instead
 
 image_translator = ImageObjectTranslator()
 

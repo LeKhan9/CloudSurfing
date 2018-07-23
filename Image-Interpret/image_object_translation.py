@@ -16,8 +16,9 @@ class ImageObjectTranslator:
     def classify_image(self, img_path):
         """
             Given an image path - predictions and annotations are provided from the vision API through a wrapper class
-        :param img_path:
-        :return:
+
+        :param img_path: full web, google storage, or local path to img
+        :return: wrapper class to encapsulate various responses from annotation API
         """
         image = ImageObjectTranslator.get_raw_img(img_path)
         detected_aspects = self.image_client.web_detection(image=image).web_detection
