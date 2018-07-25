@@ -1,21 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Image Interpret</title>
-  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
-</head>
+    <head>
+      <meta charset="UTF-8">
+      <title>Image Interpret</title>
+      <link rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+            integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+            crossorigin="anonymous">
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 
-<body>
-<header class="navbar">
-  <form action="/upload" method="post" enctype="multipart/form-data" >
-      <span class="btn btn-default btn-file">
-        Browse <input type="file" name="image">
-      </span>
+      <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='static/styles/style.css') }}">
 
-    <input type="submit" value="Upload your image" class="btn btn-primary">
-  </form>
-</header>
+    </head>
 
-</body>
+    <body>
+        <header class="navbar navbar-default">
+          <span class="navbar-text">
+              Leveraging the Google Cloud Vision and Translation APIs to Understand Images</span>
+        </header>
+
+        <div id="content">
+            <form action="/upload" method="post" enctype="multipart/form-data" >
+                <label class="btn btn-default btn-file">
+                    Browse <input type="file" name="image" style="display: none;">
+                </label>
+                <input type="submit" value="Upload Image to Interpret" class="btn btn-primary"
+                       onclick="$('#loading').show();$('#content').hide();">
+            </form>
+        </div>
+
+        <h2>
+            <div id="loading" style="display:none;">
+                <img src="static/loadingimage.gif" height="42" width="42" alt="" />  Loading ... Patience is a virtue.
+            </div>
+        </h2>
+
+      {% if filename %}
+      <div class="card" style="width: 40rem;" >
+          <img class="card-img-top" src="{{ url_for('send_file', filename=filename) }}" height="250" width="250">
+          <div class="card-body">
+            <h5 class="card-title">Top Classifications: {{highest_matches}}</h5>
+            <p class="card-text">Some useful links you may use to learn more about this image</p>
+
+            <ul class="list-group list-group-flush">
+              {% if relevant_page %}
+                    <li class="list-group-item">
+                      <a href="{{ relevant_page }}" class="card-link">Predicted relevant online article</a>
+                    </li>
+              {% endif %}
+
+              {% if wikipedia_article %}
+                    <li class="list-group-item">
+                <a href="{{ wikipedia_article }}" class="card-link">Related Wikipedia article</a>
+                    </li>
+              {% endif %}
+
+              {% if full_matched_image %}
+                    <li class="list-group-item">
+                <a href="{{ full_matched_image }}" class="card-link">Full matched image found online</a>
+                    </li>
+              {% endif %}
+
+              {% if partial_matched_image %}
+                    <li class="list-group-item">
+                <a href="{{ partial_matched_image }}" class="card-link">Partial matched image found online</a>
+                    </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+    </body>
 </html>

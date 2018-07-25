@@ -38,15 +38,10 @@ class ImageObjectTranslator:
         :param img_path: full web, google storage, or local path to img
         :return: compressed image object
         """
+        with io.open(img_path, 'rb') as image_file:
+            content = image_file.read()
 
-        if img_path.startswith('http') or img_path.startswith('gs:'):
-            image = types.Image()
-            image.source.image_uri = img_path
-        else:
-            with io.open(img_path, 'rb') as image_file:
-                content = image_file.read()
-
-            image = types.Image(content=content)
+        image = types.Image(content=content)
 
         return image
 
@@ -62,7 +57,7 @@ class ImageObjectTranslator:
 
         if token:
             print '\n{}'.format(msg)
-            print token.url
+            print token
 
 def main():
     image_translator = ImageObjectTranslator()

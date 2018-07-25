@@ -28,7 +28,7 @@ class WebDetectResponse:
         :return: page json object from annotation API response
         """
 
-        return self.relevant_pages[0] if self.relevant_pages else None
+        return self.relevant_pages[0].url if self.relevant_pages else None
 
     def get_full_image_match(self):
         """
@@ -37,7 +37,7 @@ class WebDetectResponse:
         :return: full image json object from annotation API response
         """
 
-        return self.full_image_matches[0] if self.full_image_matches else None
+        return self.full_image_matches[0].url if self.full_image_matches else None
 
     def get_partial_image_match(self):
         """
@@ -46,7 +46,7 @@ class WebDetectResponse:
         :return: partial image json object from annotation API response
         """
 
-        return self.partial_image_matches[0] if self.partial_image_matches else None
+        return self.partial_image_matches[0].url if self.partial_image_matches else None
 
     def get_classes_by_score(self):
         """
@@ -78,4 +78,4 @@ class WebDetectResponse:
         full_wiki_url = WebDetectResponse.WIKIPEDIA_ENDPOINT.format(main_predicted_class)
         wiki_response = requests.get(full_wiki_url)
 
-        return wiki_response if wiki_response.status_code == 200 else None
+        return wiki_response.url if wiki_response.status_code == 200 else None
