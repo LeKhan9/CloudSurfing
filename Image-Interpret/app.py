@@ -38,7 +38,7 @@ def upload_file():
 
         highest_matches = [str(tup[0]) for tup in class_weights_tuples][:3]
 
-    return render_template('index.html',
+    return render_template('upload_success.html',
                            relevant_page=relevant_page,
                            full_matched_image=full_matched_image,
                            partial_matched_image=partial_matched_image,

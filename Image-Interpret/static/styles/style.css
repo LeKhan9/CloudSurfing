@@ -17,3 +17,8 @@
 .container {
     padding: 2px 16px;
 }
+
+.holder {
+  width: auto;
+  display: inline-block;
+}

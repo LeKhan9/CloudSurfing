@@ -1,4 +1,5 @@
 import io
+import argparse
 
 from google.cloud import vision
 from google.cloud.vision import types
@@ -60,8 +61,16 @@ class ImageObjectTranslator:
             print token
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--img", help="full file path to img")
+    parser.add_argument("--verbose",
+                        help="verbose mode will print extra details",
+                        action='store_true')
+
+    args = parser.parse_args()
+
     image_translator = ImageObjectTranslator()
-    web_detect_response = image_translator.classify_image('/Users/mkhan7/Desktop/hello.jpg')
+    web_detect_response = image_translator.classify_image(args.img)
 
     relevant_page = web_detect_response.get_relevant_page()
     full_matched_image = web_detect_response.get_full_image_match()
@@ -69,10 +78,11 @@ def main():
     class_weights_tuples = web_detect_response.get_classes_by_score()
     wikipedia_article = web_detect_response.get_wikipedia_article()
 
-    image_translator.print_url_with_msg_for_token(relevant_page, 'Relevant Page:')
-    image_translator.print_url_with_msg_for_token(wikipedia_article, 'Relevant Wikipedia Article:')
-    image_translator.print_url_with_msg_for_token(full_matched_image, 'Found full matched image:')
-    image_translator.print_url_with_msg_for_token(partial_matched_image, 'Found partial matched image:')
+    if args.verbose:
+        image_translator.print_url_with_msg_for_token(relevant_page, 'Relevant Page:')
+        image_translator.print_url_with_msg_for_token(wikipedia_article, 'Relevant Wikipedia Article:')
+        image_translator.print_url_with_msg_for_token(full_matched_image, 'Found full matched image:')
+        image_translator.print_url_with_msg_for_token(partial_matched_image, 'Found partial matched image:')
 
     print '\nTop Classifications'
     if class_weights_tuples:
