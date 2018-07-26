@@ -5,6 +5,8 @@ from google.cloud import vision
 from google.cloud.vision import types
 from google.cloud import translate
 
+from flask import current_app
+
 from web_detect_data import WebDetectResponse
 
 
@@ -39,10 +41,14 @@ class ImageObjectTranslator:
         :param img_path: full web, google storage, or local path to img
         :return: compressed image object
         """
-        with io.open(img_path, 'rb') as image_file:
-            content = image_file.read()
+        if img_path.startswith('http') or img_path.startswith('gs:'):
+            image = types.Image()
+            image.source.image_uri = img_path
+        else:
+            with io.open(img_path, 'rb') as image_file:
+                content = image_file.read()
 
-        image = types.Image(content=content)
+            image = types.Image(content=content)
 
         return image
 

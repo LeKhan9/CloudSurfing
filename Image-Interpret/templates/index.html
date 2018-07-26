@@ -8,6 +8,10 @@
             integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
             crossorigin="anonymous">
       <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+          <link rel= "stylesheet" type= "text/css" href= "static/styles/style.css">
+                  <link rel= "stylesheet" type= "text/css" href= "static/styles/responsive_gallery.css">
+
+
     </head>
 
     <body>
@@ -22,15 +26,90 @@
                     Browse <input type="file" name="image" style="display: none;">
                 </label>
                 <input type="submit" value="Upload Image to Interpret" class="btn btn-primary"
-                       onclick="$('#loading').show();$('#content').hide();">
+                       onclick="$('#loading').show();$('#content').hide();$('#warning').hide();">
             </form>
         </div>
 
         <h2>
             <div id="loading" style="display:none;">
-                <img src="static/loadingimage.gif" height="42" width="42" alt="" />  Loading ... Patience is a virtue.
+                <img src="static/loadingimage.gif" height="38" width="38" alt="" />  Loading ... patience is a virtue :]
             </div>
         </h2>
+
+
+        <div id="warning">
+
+                      {% if no_file %}
+        <h2> No file chosen! please upload a file </h2>
+
+          {% endif %}
+              {% if wrong_extension %}
+        <h2> Please use a proper file name extension ['png', 'jpg', 'jpeg'] </h2>
+
+          {% endif %}
+        </div>
+
+
+
+      {% if filename %}
+
+  <div class="card" style="width: 40rem;" >
+    <img class="card-img-top holder" src="{{ filename }}" height="150" width="150">
+  <div class="card-body">
+    <h5 class="card-title">Top Classifications: {{highest_matches}}</h5>
+    <p class="card-text">Some useful links you may use to learn more about this image</p>
+
+    <ul class="list-group list-group-flush">
+      {% if relevant_page %}
+            <li class="list-group-item">
+              <a href="{{ relevant_page }}" class="card-link">Predicted relevant online article</a>
+            </li>
+      {% endif %}
+
+      {% if wikipedia_article %}
+            <li class="list-group-item">
+        <a href="{{ wikipedia_article }}" class="card-link">Related Wikipedia article</a>
+            </li>
+      {% endif %}
+
+      {% if full_matched_image %}
+            <li class="list-group-item">
+        <a href="{{ full_matched_image }}" class="card-link">Full matched image found online</a>
+            </li>
+      {% endif %}
+
+      {% if partial_matched_image %}
+            <li class="list-group-item">
+        <a href="{{ partial_matched_image }}" class="card-link">Partial matched image found online</a>
+            </li>
+      {% endif %}
+    </ul>
+
+
+  </div>
+</div>
+
+  {% endif %}
+
+      {% if results %}
+
+        <h2>A Gallery of Recently Analyzed Images</h2>
+
+
+        {% for result in results %}
+
+                <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="{{ result }}">
+              <img src="{{ result }}" width="300" height="300">
+            </a>
+            <div class="desc">Add a description of the image here</div>
+          </div>
+        </div>
+
+        {% endfor %}
+  {% endif %}
+
 
     </body>
 </html>

@@ -74,8 +74,10 @@ class WebDetectResponse:
         if not self.classifications:
             return None
 
-        main_predicted_class = self.classifications[0].description.replace(' ', '_')
+        main_predicted_class = self.classifications[0].description.replace(' ', '_').encode('utf8', 'replace')
+        print main_predicted_class
         full_wiki_url = WebDetectResponse.WIKIPEDIA_ENDPOINT.format(main_predicted_class)
+        print full_wiki_url
         wiki_response = requests.get(full_wiki_url)
 
         return wiki_response.url if wiki_response.status_code == 200 else None
