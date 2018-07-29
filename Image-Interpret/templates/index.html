@@ -7,11 +7,9 @@
             href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
             integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
             crossorigin="anonymous">
+      <link rel= "stylesheet" type= "text/css" href= "static/styles/style.css">
+      <link rel= "stylesheet" type= "text/css" href= "static/styles/responsive_gallery.css">
       <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-          <link rel= "stylesheet" type= "text/css" href= "static/styles/style.css">
-                  <link rel= "stylesheet" type= "text/css" href= "static/styles/responsive_gallery.css">
-
-
     </head>
 
     <body>
@@ -21,7 +19,7 @@
         </header>
 
         <div id="content">
-            <form action="/upload" method="post" enctype="multipart/form-data" >
+            <form action="/interpret" method="post" enctype="multipart/form-data" >
                 <label class="btn btn-default btn-file">
                     Browse <input type="file" name="image" style="display: none;">
                 </label>
@@ -36,80 +34,84 @@
             </div>
         </h2>
 
-
         <div id="warning">
+            {% if no_file %}
+                <h2> No file chosen! please upload a file </h2>
+            {% endif %}
 
-                      {% if no_file %}
-        <h2> No file chosen! please upload a file </h2>
+            {% if wrong_extension %}
+                <h2> Please use a proper file name extension ['png', 'jpg', 'jpeg', 'gif] </h2>
+            {% endif %}
 
-          {% endif %}
-              {% if wrong_extension %}
-        <h2> Please use a proper file name extension ['png', 'jpg', 'jpeg'] </h2>
+            {% if unsafe_tags %}
+                <h2><b> This image may be unsafe, try another image - we found tags:  {{unsafe_tags}} </b></h2>
+            {% endif %}
 
-          {% endif %}
+            {% if upload_error %}
+                <h2> Encountered an upload error while pushing image blob to Cloud Storage</h2>
+            {% endif %}
         </div>
 
+        {% if filename %}
+          <div class="card" style="width: 40rem;" >
+              <img class="card-img-top holder" src="{{ filename }}" height="150" width="150">
+                  <div class="card-body">
+                    <h5 class="card-title">Classification: {{highest_matches}}</h5>
+                    <p class="card-text">Some useful links you may use to learn more about this image</p>
+                    <ul class="list-group list-group-flush">
+                          {% if relevant_page %}
+                                <li class="list-group-item">
+                                    <a href="{{ relevant_page }}" class="card-link">Predicted relevant online article</a>
+                                </li>
+                          {% endif %}
 
+                          {% if wikipedia_article %}
+                                <li class="list-group-item">
+                                    <a href="{{ wikipedia_article }}" class="card-link">Related Wikipedia article</a>
+                                </li>
+                          {% endif %}
 
-      {% if filename %}
+                          {% if full_matched_image %}
+                                <li class="list-group-item">
+                                    <a href="{{ full_matched_image }}" class="card-link">Full matched image found online</a>
+                                </li>
+                          {% endif %}
 
-  <div class="card" style="width: 40rem;" >
-    <img class="card-img-top holder" src="{{ filename }}" height="150" width="150">
-  <div class="card-body">
-    <h5 class="card-title">Top Classifications: {{highest_matches}}</h5>
-    <p class="card-text">Some useful links you may use to learn more about this image</p>
+                          {% if partial_matched_image %}
+                                <li class="list-group-item">
+                                    <a href="{{ partial_matched_image }}" class="card-link">Partial matched image found online</a>
+                                </li>
+                          {% endif %}
+                    </ul>
+                  </div>
 
-    <ul class="list-group list-group-flush">
-      {% if relevant_page %}
-            <li class="list-group-item">
-              <a href="{{ relevant_page }}" class="card-link">Predicted relevant online article</a>
-            </li>
-      {% endif %}
+           {% if translations %}
+                </div>
+                      <div class="card" style="width: 40rem;" >
+                      <div class="card-body">
+                        <h5 class="card-title">Translations for {{highest_matches[0]}}</h5>
+                           {% for lang, translation in translations.items() %}
+                                <li class="list-group-item">
+                                    <b> {{lang}} </b>: {{translation}}
+                                </li>
+                           {% endfor %}
+                      </div>
+                </div>
+            {% endif %}
+        {% endif %}
 
-      {% if wikipedia_article %}
-            <li class="list-group-item">
-        <a href="{{ wikipedia_article }}" class="card-link">Related Wikipedia article</a>
-            </li>
-      {% endif %}
-
-      {% if full_matched_image %}
-            <li class="list-group-item">
-        <a href="{{ full_matched_image }}" class="card-link">Full matched image found online</a>
-            </li>
-      {% endif %}
-
-      {% if partial_matched_image %}
-            <li class="list-group-item">
-        <a href="{{ partial_matched_image }}" class="card-link">Partial matched image found online</a>
-            </li>
-      {% endif %}
-    </ul>
-
-
-  </div>
-</div>
-
-  {% endif %}
-
-      {% if results %}
-
-        <h2>A Gallery of Recently Analyzed Images</h2>
-
-
-        {% for result in results %}
-
+        {% if stored_images %}
+            <h2>A Gallery of Recently Analyzed Images</h2>
+            {% for image in stored_images %}
                 <div class="responsive">
-          <div class="gallery">
-            <a target="_blank" href="{{ result }}">
-              <img src="{{ result }}" width="300" height="300">
-            </a>
-            <div class="desc">Add a description of the image here</div>
-          </div>
-        </div>
-
-        {% endfor %}
-  {% endif %}
-
+                      <div class="gallery">
+                          <a target="_blank" href="{{ image }}">
+                                <img src="{{ image }}" height="250" width="250" >
+                          </a>
+                      </div>
+                </div>
+            {% endfor %}
+        {% endif %}
 
     </body>
 </html>

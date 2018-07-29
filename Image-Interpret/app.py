@@ -1,110 +1,72 @@
-import os
-from flask import Flask, render_template, request, send_from_directory
-from werkzeug.utils import secure_filename
-from image_object_translation import ImageObjectTranslator
+from flask import Flask, render_template, request
+
+from scripts.cloud_store import CloudStorage
+from scripts.image_interpretation import ImageInterpreter
+from config import Config
 
 app = Flask(__name__)
-from google.cloud import storage
+app.config.from_object(Config)
 
+# -------- SETUP ----------
+HTML_BASE_PAGE = app.config.get('HTML_BASE_PAGE')
+LANGUAGES_LS = app.config.get('TRANSLATE_TO_LANG')
+ISO_LANG_MAP = app.config.get('LANGUAGE_MAP')
+ALLOWED_EXTENSIONS = app.config.get('ALLOWED_EXTENSIONS')
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-PROJECT_ID = 'quick-platform-149322'
-STORAGE_BUCKET = 'image-storage-quick-platform-149322'
-
-app.config['PROJECT_ID'] = PROJECT_ID
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['CLOUD_STORAGE_BUCKET'] = STORAGE_BUCKET
-#TODO - write to Google Cloud Storage instead
-
-image_translator = ImageObjectTranslator()
-dbase = storage.Client(project=app.config['PROJECT_ID'])
+interpreter = ImageInterpreter()
+database = CloudStorage(project_id=app.config.get('PROJECT_ID'),
+                        storage_bucket=app.config.get('CLOUD_STORAGE_BUCKET'))
+# -------------------------
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.split('.').pop().lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.split('.').pop().lower() in ALLOWED_EXTENSIONS
 
 @app.route("/")
 def welcome():
-    return render_template('index.html', results=list_blobs())
+    return render_template(HTML_BASE_PAGE, stored_images=database.get_images()) # display images already interpreted
 
-@app.route('/upload', methods=['POST'])
+@app.route('/interpret', methods=['POST'])
 def upload_file():
+    """
+        Filter out requests without images and/or improper file extensions, otherwise render response
+        using helper function below
+
+    :return:
+    """
+
     file = request.files.get('image')
+    file_name = file.filename
 
-    if not file:
-        return render_template('index.html', no_file=True)
+    if not file: # no file given
+        return render_template(HTML_BASE_PAGE, no_file=True)
 
-    is_file_ext_allowed = allowed_file(file.filename)
-    if not is_file_ext_allowed:
-        return render_template('index.html', wrong_extension=True)
+    if not allowed_file(file_name): # improper file extension
+        return render_template(HTML_BASE_PAGE, wrong_extension=True)
 
-    gcloud_url = upload_image_file(file)
+    gcloud_url = database.upload_image_file(file) # save img to Google Cloud Storage
 
-    if gcloud_url and is_file_ext_allowed:
-        # file_name = secure_filename(file.filename)
-        # full_img_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
-        # file.save(full_img_path)
-        web_detect_response = image_translator.classify_image(gcloud_url)
+    if not gcloud_url: # upload error, no URL found
+        return render_template(HTML_BASE_PAGE, upload_error=True)
 
-        relevant_page = web_detect_response.get_relevant_page()
-        full_matched_image = web_detect_response.get_full_image_match()
-        partial_matched_image = web_detect_response.get_partial_image_match()
-        class_weights_tuples = web_detect_response.get_classes_by_score()
-        wikipedia_article = web_detect_response.get_wikipedia_article()
+    response_blob = interpreter.interpret_image(gcloud_url)
+    return render_vision_api_response(response_blob, file_name, gcloud_url)
 
-        highest_matches = [tup[0].encode('utf8', 'replace') for tup in class_weights_tuples][:2]
-
-
-    return render_template('index.html',
-                           relevant_page=relevant_page,
-                           full_matched_image=full_matched_image,
-                           partial_matched_image=partial_matched_image,
-                           wikipedia_article=wikipedia_article,
-                           highest_matches=highest_matches,
-                           filename=gcloud_url,
-                           results=list_blobs())
-
-
-def upload_file(file_stream, filename, content_type):
+def render_vision_api_response(response_blob, file_name, gcloud_url):
     """
-    Uploads a file to a given Cloud Storage bucket and returns the public url
-    to the new object.
+        Filters out unsafe images and displays Vision API image aspects, some helpful links, and language translations
+
+    :param response_blob: custom wrapper class to encapsulate all Vision API response data
+    :param file_name: full file name
+    :param gcloud_url: URL of file on google cloud - entry point for running Vision API requests
+    :return: HTML Flask render object
     """
 
-    bucket = dbase.bucket(app.config['CLOUD_STORAGE_BUCKET'])
-    blob = bucket.blob(filename)
+    unsafe_tags = response_blob.get_unsafe_tags()
+    if unsafe_tags: # image tagged as unsafe
+        database.delete_blob(file_name)
+        return render_template(HTML_BASE_PAGE, unsafe_tags=unsafe_tags)
 
-    blob.upload_from_string(
-        file_stream,
-        content_type=content_type)
+    # extract dict of relevant API response metadata to display in HTML to user
+    interpreter_params = interpreter.build_html_params(LANGUAGES_LS, ISO_LANG_MAP, response_blob)
 
-    url = blob.public_url
-
-    return url
-
-def upload_image_file(file):
-
-    """
-    Upload the user-uploaded file to Google Cloud Storage and retrieve its
-    publicly-accessible URL.
-    """
-    if not file:
-        return None
-
-    public_url = upload_file(
-        file.read(),
-        file.filename,
-        file.content_type
-    )
-    return public_url
-
-
-def list_blobs():
-    """Lists all the blobs in the bucket."""
-    bucket = dbase.get_bucket(app.config['CLOUD_STORAGE_BUCKET'])
-
-    blobs = bucket.list_blobs()
-    img_urls = [blob.public_url for blob in blobs]
-    return img_urls
-
+    return render_template(HTML_BASE_PAGE, filename=gcloud_url, stored_images=database.get_images(), **interpreter_params)
