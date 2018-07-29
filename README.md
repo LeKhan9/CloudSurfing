@@ -24,7 +24,7 @@ You can click on any of these links to take you to relevant pages. Examples for 
 
 [Predicted relevant online article](https://en.wiktionary.org/wiki/cat)
 
-[Relevant predicted Wikipedia article](https://en.wikipedia.org/wiki/Kitten)
+[Predicted relevant Wikipedia article](https://en.wikipedia.org/wiki/Kitten)
 
 
 **Image classification translations are presented to the user in a card:**
