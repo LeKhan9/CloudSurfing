@@ -5,17 +5,17 @@ class CloudStorage:
         self.data_base = storage.Client(project=project_id)
         self.bucket = storage_bucket
 
-    def upload_image_file(self, file):
+    def upload_image_file(self, image_file):
         """
             Takes a Flask request file object and uploads it to Google Cloud Storage
-        :param file: Flask request file object
+        :param image_file: Flask request file object
         :return: Google Cloud Storage URL for image
         """
 
-        if not file:
+        if not image_file:
             return None
 
-        image_url = self.upload_as_blob(file.read(), file.filename, file.content_type)
+        image_url = self.upload_as_blob(image_file.read(), image_file.filename, image_file.content_type)
 
         return image_url
 

@@ -34,16 +34,16 @@ def upload_file():
     :return:
     """
 
-    file = request.files.get('image')
-    file_name = file.filename
+    image_file = request.files.get('image')
+    file_name = image_file.filename
 
-    if not file: # no file given
+    if not image_file: # no file given
         return render_template(HTML_BASE_PAGE, no_file=True)
 
     if not allowed_file(file_name): # improper file extension
         return render_template(HTML_BASE_PAGE, wrong_extension=True)
 
-    gcloud_url = database.upload_image_file(file) # save img to Google Cloud Storage
+    gcloud_url = database.upload_image_file(image_file) # save img to Google Cloud Storage
 
     if not gcloud_url: # upload error, no URL found
         return render_template(HTML_BASE_PAGE, upload_error=True)
