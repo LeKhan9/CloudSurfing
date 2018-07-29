@@ -20,7 +20,12 @@ These relevant web links and translations are displayed to the user. A recently 
 **Image interpretations and links are presented to the user in a card:**
 <img src="https://storage.googleapis.com/quick-platform-149322.appspot.com/relevant_links.png" alt="drawing" width="400" height="400"/>
 
-You can click on any of these links to take you to relevant pages.
+You can click on any of these links to take you to relevant pages. Examples for the image above:
+
+[Predicted relevant online article](https://en.wiktionary.org/wiki/cat)
+
+[Relevant predicted Wikipedia article](https://en.wikipedia.org/wiki/Kitten)
+
 
 **Image classification translations are presented to the user in a card:**
 
