@@ -1,14 +1,11 @@
 import requests
 
+from ..config import Config
 
 class ResponseBlob:
     """
         Wrapper for data responses out of cloud Image Annotation API with getters to simplify interface with Flask app
     """
-
-    WIKIPEDIA_ENDPOINT = 'https://en.wikipedia.org/wiki/{}'
-    UNSAFE_IMG_TAGS = ['adult', 'violence', 'racy']
-    UNSAFE_IMG_PROBABILITY_THRESHOLD = 4
 
     def __init__(self, cloud_web_response, safety_metadata):
         """
@@ -78,9 +75,9 @@ class ResponseBlob:
         """
 
         tags = []
-        for tag in ResponseBlob.UNSAFE_IMG_TAGS:
+        for tag in Config.UNSAFE_IMG_TAGS:
             probability = getattr(self.safety_metadata, tag)
-            if probability < ResponseBlob.UNSAFE_IMG_PROBABILITY_THRESHOLD:
+            if probability < Config.UNSAFE_IMG_PROBABILITY_THRESHOLD:
                 continue
             tags.append(tag)
         return tags
@@ -96,7 +93,7 @@ class ResponseBlob:
             return None
 
         main_predicted_class = self.classifications[0].description.replace(' ', '_')
-        full_wiki_url = ResponseBlob.WIKIPEDIA_ENDPOINT.format(main_predicted_class)
+        full_wiki_url = Config.WIKIPEDIA_ENDPOINT.format(main_predicted_class)
         wiki_response = requests.get(full_wiki_url)
 
         return wiki_response.url if wiki_response.status_code == 200 else None
