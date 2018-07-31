@@ -35,7 +35,7 @@ class ImageInterpreter:
 
         :param text: input string to translate
         :param target_language: ISO 639-1 code for language to translate to; ex: 'es' for Spanish
-        :return:
+        :return: string translation of input text in desired image
         """
 
         translation_response = self.translate_client.translate(text, target_language=target_language)

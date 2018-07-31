@@ -31,7 +31,7 @@ def upload_file():
         Filter out requests without images and/or improper file extensions, otherwise render response
         using helper function below
 
-    :return:
+    :return: HTML Flask render object detailing image interpretation; refer to the render_vision_api_response function
     """
 
     image_file = request.files.get('image')

@@ -1,5 +1,6 @@
 import requests
 
+
 class ResponseBlob:
     """
         Wrapper for data responses out of cloud Image Annotation API with getters to simplify interface with Flask app

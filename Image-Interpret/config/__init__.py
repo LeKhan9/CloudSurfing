@@ -14,7 +14,6 @@ class Config(object):
     with open('config/iso_639_1_codes.json') as f:
         LANGUAGE_MAP = json.load(f)
 
-
     WIKIPEDIA_ENDPOINT = 'https://en.wikipedia.org/wiki/{}'
     UNSAFE_IMG_TAGS = ['adult', 'violence', 'racy']
     UNSAFE_IMG_PROBABILITY_THRESHOLD = 4

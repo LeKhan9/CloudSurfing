@@ -8,6 +8,7 @@ class CloudStorage:
     def upload_image_file(self, image_file):
         """
             Takes a Flask request file object and uploads it to Google Cloud Storage
+
         :param image_file: Flask request file object
         :return: Google Cloud Storage URL for image
         """
