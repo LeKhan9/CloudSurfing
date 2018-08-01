@@ -9,8 +9,6 @@ app.config.from_object(Config)
 
 # -------- SETUP ----------
 HTML_BASE_PAGE = app.config.get('HTML_BASE_PAGE')
-LANGUAGES_LS = app.config.get('TRANSLATE_TO_LANG')
-ISO_LANG_MAP = app.config.get('LANGUAGE_MAP')
 ALLOWED_EXTENSIONS = app.config.get('ALLOWED_EXTENSIONS')
 
 interpreter = ImageInterpreter()
@@ -67,6 +65,6 @@ def render_vision_api_response(response_blob, file_name, gcloud_url):
         return render_template(HTML_BASE_PAGE, unsafe_tags=unsafe_tags)
 
     # extract dict of relevant API response metadata to display in HTML to user
-    interpreter_params = interpreter.build_html_params(LANGUAGES_LS, ISO_LANG_MAP, response_blob)
+    interpreter_params = interpreter.build_html_params(response_blob)
 
     return render_template(HTML_BASE_PAGE, filename=gcloud_url, stored_images=database.get_images(), **interpreter_params)

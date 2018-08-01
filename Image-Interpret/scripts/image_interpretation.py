@@ -6,7 +6,7 @@ from google.cloud import translate
 from google.cloud.vision import types
 
 from vision_api_response import ResponseBlob
-
+from ..config import Config
 
 class ImageInterpreter:
 
@@ -45,14 +45,12 @@ class ImageInterpreter:
 
         return ''
 
-    def build_html_params(self, languages_ls, iso_lang_map, response_blob):
+    def build_html_params(self, response_blob):
         """
             Builds a dict of params to pass to the main HTML page for the app;
             Parameter data is parsed from the custom ResponseBlob object and from live translations
                 through the Google translation API
 
-        :param languages_ls: A list of languages to translate to - labeled as ISO codes
-        :param iso_lang_map: A map of ISO 639-1 codes to language
         :param response_blob: custom wrapper class for Vision API output
         :return: dict of parameters to pass to the html page
         """
@@ -63,13 +61,12 @@ class ImageInterpreter:
         wikipedia_article = response_blob.get_wikipedia_article()
         class_weights_tuples = response_blob.get_classes_by_score()
 
-        # encoding in case unexpected unicode characters are encountered
         highest_matches = [tup[0] for tup in class_weights_tuples][:2]
         top_pred = highest_matches[0]
 
         translations = {}
-        for lang in languages_ls:
-            translations[iso_lang_map.get(lang)] = self.translate_prediction(top_pred, lang)
+        for language in Config.TRANSLATE_TO_LANG:
+            translations[Config.LANGUAGE_MAP.get(language)] = self.translate_prediction(top_pred, language)
 
         html_params = {'relevant_page': relevant_page,
                        'full_matched_image': full_matched_image,

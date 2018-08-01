@@ -14,7 +14,7 @@ class CloudStorage:
         """
 
         if not image_file:
-            return None
+            return ''
 
         image_url = self.upload_as_blob(image_file.read(), image_file.filename, image_file.content_type)
 

@@ -31,7 +31,7 @@ class ResponseBlob:
         :return: page json object from annotation API response
         """
 
-        return self.relevant_pages[0].url if self.relevant_pages else None
+        return self.relevant_pages[0].url if self.relevant_pages else ''
 
     def get_full_image_match(self):
         """
@@ -40,7 +40,7 @@ class ResponseBlob:
         :return: full image json object from annotation API response
         """
 
-        return self.full_image_matches[0].url if self.full_image_matches else None
+        return self.full_image_matches[0].url if self.full_image_matches else ''
 
     def get_partial_image_match(self):
         """
@@ -49,7 +49,7 @@ class ResponseBlob:
         :return: partial image json object from annotation API response
         """
 
-        return self.partial_image_matches[0].url if self.partial_image_matches else None
+        return self.partial_image_matches[0].url if self.partial_image_matches else ''
 
     def get_classes_by_score(self):
         """
@@ -90,10 +90,10 @@ class ResponseBlob:
         """
 
         if not self.classifications:
-            return None
+            return ''
 
         main_predicted_class = self.classifications[0].description.replace(' ', '_')
         full_wiki_url = Config.WIKIPEDIA_ENDPOINT.format(main_predicted_class)
         wiki_response = requests.get(full_wiki_url)
 
-        return wiki_response.url if wiki_response.status_code == 200 else None
+        return wiki_response.url if wiki_response.status_code == 200 else ''
