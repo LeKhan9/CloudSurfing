@@ -131,13 +131,14 @@ def main():
 
     print '\nTop Classifications'
     if pred_weights_tuples:
-        for pred, weight in pred_weights_tuples[:3]:
+        for pred, weight in pred_weights_tuples:
             print 'Prediction: {}, Confidence: {:.2f}'.format(pred, weight)
 
-    print 'Translation of top prediction in Arabic:'
-    print interpreter.translate_prediction(pred_weights_tuples[0][0], 'ar')
 
     if args.verbose:
+        print 'Translation of top prediction in Arabic:'
+        print interpreter.translate_prediction(pred_weights_tuples[0][0], 'ar')
+
         interpreter.print_url_with_msg_for_token(relevant_page, 'Relevant Page:')
         interpreter.print_url_with_msg_for_token(wikipedia_article, 'Relevant Wikipedia Article:')
         interpreter.print_url_with_msg_for_token(full_matched_image, 'Found full matched image:')
